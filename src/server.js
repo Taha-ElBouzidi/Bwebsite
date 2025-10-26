@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('path');
+const session = require('express-session');
+const bcrypt = require('bcryptjs');
 const db = require('./db/connection');
 const { runMigrations, seedDefaults } = require('./db/setup');
 
@@ -9,6 +11,30 @@ seedDefaults();
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(
+  session({
+    name: 'dashboard.sid',
+    secret: process.env.SESSION_SECRET || 'change-me',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production'
+    }
+  })
+);
+
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
+const requireAuth = (req, res, next) => {
+  if (req.session?.ownerId) {
+    return next();
+  }
+
+  return res.status(401).json({ error: 'Unauthorized' });
+};
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
@@ -36,6 +62,45 @@ app.get('/api/business', (_req, res) => {
   res.json(getBusinessProfile());
 });
 
+app.get('/api/auth/session', (req, res) => {
+  res.json({ authenticated: Boolean(req.session?.ownerId) });
+});
+
+app.post('/api/auth/login', (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required.' });
+  }
+
+  const owner = db.prepare('SELECT id, username, password_hash FROM owners WHERE username = ?').get(username);
+
+  if (!owner) {
+    return res.status(401).json({ error: 'Invalid credentials.' });
+  }
+
+  const isValid = bcrypt.compareSync(password, owner.password_hash);
+
+  if (!isValid) {
+    return res.status(401).json({ error: 'Invalid credentials.' });
+  }
+
+  req.session.ownerId = owner.id;
+  res.json({ authenticated: true, username: owner.username });
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  req.session?.destroy((error) => {
+    if (error) {
+      return res.status(500).json({ error: 'Failed to log out.' });
+    }
+
+    res.clearCookie('dashboard.sid');
+    return res.status(204).end();
+  });
+});
+
+app.put('/api/business', requireAuth, (req, res) => {
 app.put('/api/business', (req, res) => {
   const {
     name,
@@ -85,6 +150,7 @@ app.get('/api/services', (_req, res) => {
   res.json(services);
 });
 
+app.post('/api/services', requireAuth, (req, res) => {
 app.post('/api/services', (req, res) => {
   const { title, summary, display_order: displayOrder = 0 } = req.body;
   const stmt = db.prepare(
@@ -97,6 +163,7 @@ app.post('/api/services', (req, res) => {
   res.status(201).json(service);
 });
 
+app.put('/api/services/:id', requireAuth, (req, res) => {
 app.put('/api/services/:id', (req, res) => {
   const { id } = req.params;
   const { title, summary, display_order: displayOrder } = req.body;
@@ -110,6 +177,7 @@ app.put('/api/services/:id', (req, res) => {
   res.json(service);
 });
 
+app.delete('/api/services/:id', requireAuth, (req, res) => {
 app.delete('/api/services/:id', (req, res) => {
   const { id } = req.params;
   const stmt = db.prepare('DELETE FROM services WHERE id = ?');
@@ -122,6 +190,7 @@ app.get('/api/testimonials', (_req, res) => {
   res.json(testimonials);
 });
 
+app.post('/api/testimonials', requireAuth, (req, res) => {
 app.post('/api/testimonials', (req, res) => {
   const { author, quote, role } = req.body;
   const stmt = db.prepare(
@@ -134,6 +203,7 @@ app.post('/api/testimonials', (req, res) => {
   res.status(201).json(testimonial);
 });
 
+app.put('/api/testimonials/:id', requireAuth, (req, res) => {
 app.put('/api/testimonials/:id', (req, res) => {
   const { id } = req.params;
   const { author, quote, role } = req.body;
@@ -147,12 +217,14 @@ app.put('/api/testimonials/:id', (req, res) => {
   res.json(testimonial);
 });
 
+app.delete('/api/testimonials/:id', requireAuth, (req, res) => {
 app.delete('/api/testimonials/:id', (req, res) => {
   const { id } = req.params;
   db.prepare('DELETE FROM testimonials WHERE id = ?').run(id);
   res.status(204).end();
 });
 
+app.get('/api/leads', requireAuth, (_req, res) => {
 app.get('/api/leads', (_req, res) => {
   const leads = db
     .prepare(

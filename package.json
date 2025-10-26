@@ -9,11 +9,21 @@
     "migrate": "node -e \"const setup = require('./src/db/setup'); setup.runMigrations(); setup.seedDefaults(); console.log('Database ready');\"",
     "test": "node -e \"console.log('No automated tests specified');\""
   },
+  "keywords": [
+    "landing-page",
+    "dashboard",
+    "sqlite",
+    "express"
+  ],
   "keywords": ["landing-page", "dashboard", "sqlite", "express"],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "better-sqlite3": "^12.4.1",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2"
     "better-sqlite3": "^12.4.1",
     "express": "^5.1.0"
   },

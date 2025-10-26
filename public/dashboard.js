@@ -5,6 +5,50 @@ const testimonialForm = document.querySelector('#testimonial-form');
 const servicesTable = document.querySelector('#services-table');
 const testimonialsTable = document.querySelector('#testimonials-table');
 const leadsTable = document.querySelector('#leads-table');
+const dashboardHeader = document.querySelector('#dashboard-header');
+const dashboardMain = document.querySelector('#dashboard-main');
+const loginPanel = document.querySelector('#login-panel');
+const loginForm = document.querySelector('#login-form');
+const loginFeedback = document.querySelector('#login-feedback');
+const logoutButton = document.querySelector('#logout-button');
+
+let isAuthenticated = false;
+
+function setAuthState(authenticated) {
+  isAuthenticated = authenticated;
+
+  if (authenticated) {
+    dashboardHeader?.classList.remove('hidden');
+    dashboardMain?.classList.remove('hidden');
+    loginPanel?.classList.add('hidden');
+    if (loginFeedback) {
+      loginFeedback.textContent = '';
+    }
+    return;
+  }
+
+  dashboardHeader?.classList.add('hidden');
+  dashboardMain?.classList.add('hidden');
+  loginPanel?.classList.remove('hidden');
+}
+
+function handleUnauthorized(message = 'Please sign in to continue.') {
+  setAuthState(false);
+  if (loginFeedback) {
+    loginFeedback.textContent = message;
+  }
+}
+
+async function apiFetch(url, options) {
+  const response = await fetch(url, options);
+
+  if (response.status === 401) {
+    handleUnauthorized('Your session has expired. Please sign in again.');
+    throw new Error('Unauthorized');
+  }
+
+  return response;
+}
 
 const formatDate = (value) => {
   if (!value) return '';
@@ -15,6 +59,7 @@ const formatDate = (value) => {
 };
 
 async function loadBusinessProfile() {
+  const res = await apiFetch('/api/business');
   const res = await fetch('/api/business');
   if (!res.ok) throw new Error('Failed to load business profile');
   const profile = await res.json();
@@ -33,6 +78,7 @@ async function loadBusinessProfile() {
 }
 
 async function loadServices() {
+  const res = await apiFetch('/api/services');
   const res = await fetch('/api/services');
   if (!res.ok) throw new Error('Failed to load services');
   const services = await res.json();
@@ -40,6 +86,7 @@ async function loadServices() {
 }
 
 async function loadTestimonials() {
+  const res = await apiFetch('/api/testimonials');
   const res = await fetch('/api/testimonials');
   if (!res.ok) throw new Error('Failed to load testimonials');
   const testimonials = await res.json();
@@ -47,6 +94,7 @@ async function loadTestimonials() {
 }
 
 async function loadLeads() {
+  const res = await apiFetch('/api/leads');
   const res = await fetch('/api/leads');
   if (!res.ok) throw new Error('Failed to load leads');
   const leads = await res.json();
@@ -83,6 +131,12 @@ function renderServices(services) {
         if (action === 'delete') {
           const confirmed = confirm('Remove this service?');
           if (!confirmed) return;
+          try {
+            await apiFetch(`/api/services/${id}`, { method: 'DELETE' });
+            await loadServices();
+          } catch (error) {
+            console.error(error);
+          }
           await fetch(`/api/services/${id}`, { method: 'DELETE' });
           await loadServices();
         }
@@ -92,6 +146,16 @@ function renderServices(services) {
           const summary = prompt('Service summary', service.summary);
           if (summary === null) return;
           const order = prompt('Display order', service.display_order ?? 0);
+          try {
+            await apiFetch(`/api/services/${id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ title, summary, display_order: Number(order) || 0 })
+            });
+            await loadServices();
+          } catch (error) {
+            console.error(error);
+          }
           await fetch(`/api/services/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -136,6 +200,12 @@ function renderTestimonials(testimonials) {
         if (action === 'delete') {
           const confirmed = confirm('Remove this testimonial?');
           if (!confirmed) return;
+          try {
+            await apiFetch(`/api/testimonials/${id}`, { method: 'DELETE' });
+            await loadTestimonials();
+          } catch (error) {
+            console.error(error);
+          }
           await fetch(`/api/testimonials/${id}`, { method: 'DELETE' });
           await loadTestimonials();
         }
@@ -146,6 +216,16 @@ function renderTestimonials(testimonials) {
           if (role === null) return;
           const quote = prompt('Quote', testimonial.quote);
           if (quote === null) return;
+          try {
+            await apiFetch(`/api/testimonials/${id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ author, role, quote })
+            });
+            await loadTestimonials();
+          } catch (error) {
+            console.error(error);
+          }
           await fetch(`/api/testimonials/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -193,6 +273,7 @@ businessForm?.addEventListener('submit', async (event) => {
   const payload = Object.fromEntries(formData.entries());
   businessFeedback.textContent = 'Saving…';
   try {
+    const res = await apiFetch('/api/business', {
     const res = await fetch('/api/business', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -202,6 +283,7 @@ businessForm?.addEventListener('submit', async (event) => {
     businessFeedback.textContent = 'Saved! Refresh the landing page to see the update.';
   } catch (error) {
     businessFeedback.textContent = 'Unable to save changes. Please retry.';
+    console.error(error);
   }
 });
 
@@ -210,6 +292,18 @@ serviceForm?.addEventListener('submit', async (event) => {
   const formData = new FormData(serviceForm);
   const payload = Object.fromEntries(formData.entries());
   payload.display_order = Number(payload.display_order) || 0;
+  try {
+    const res = await apiFetch('/api/services', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      serviceForm.reset();
+      await loadServices();
+    }
+  } catch (error) {
+    console.error(error);
   const res = await fetch('/api/services', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -225,6 +319,92 @@ testimonialForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
   const formData = new FormData(testimonialForm);
   const payload = Object.fromEntries(formData.entries());
+  try {
+    const res = await apiFetch('/api/testimonials', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      testimonialForm.reset();
+      await loadTestimonials();
+    }
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+loginForm?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const formData = new FormData(loginForm);
+  const payload = Object.fromEntries(formData.entries());
+  if (loginFeedback) {
+    loginFeedback.textContent = 'Signing in…';
+  }
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (loginFeedback) {
+        loginFeedback.textContent = data.error || 'Invalid credentials. Try again.';
+      }
+      return;
+    }
+
+    loginForm.reset();
+    setAuthState(true);
+    await loadDashboardData();
+  } catch (error) {
+    if (loginFeedback) {
+      loginFeedback.textContent = 'Unable to sign in. Please try again.';
+    }
+    console.error(error);
+  }
+});
+
+logoutButton?.addEventListener('click', async () => {
+  try {
+    await fetch('/api/auth/logout', { method: 'POST' });
+  } finally {
+    handleUnauthorized('You have been signed out. Please sign in again.');
+  }
+});
+
+async function loadDashboardData() {
+  if (!isAuthenticated) return;
+
+  try {
+    await Promise.all([loadBusinessProfile(), loadServices(), loadTestimonials(), loadLeads()]);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function checkSession() {
+  try {
+    const res = await fetch('/api/auth/session');
+    if (!res.ok) throw new Error('Unable to verify session');
+    const data = await res.json();
+
+    if (data.authenticated) {
+      setAuthState(true);
+      await loadDashboardData();
+    } else {
+      setAuthState(false);
+    }
+  } catch (error) {
+    setAuthState(false);
+    console.error(error);
+  }
+}
+
+checkSession();
   const res = await fetch('/api/testimonials', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

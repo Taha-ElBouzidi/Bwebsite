@@ -13,11 +13,37 @@
     />
   </head>
   <body>
+    <header class="dashboard-header hidden" id="dashboard-header">
     <header class="dashboard-header">
       <div>
         <h1>Website Control Center</h1>
         <p>Update your landing page copy, manage services, share testimonials, and review incoming leads.</p>
       </div>
+      <div class="header-actions">
+        <a class="btn" href="/">View live site</a>
+        <button class="btn outline" type="button" id="logout-button">Log out</button>
+      </div>
+    </header>
+
+    <section class="panel login-panel" id="login-panel">
+      <h2>Owner sign in</h2>
+      <p class="login-copy">Log in to manage your landing page and review new leads.</p>
+      <form id="login-form" class="login-form">
+        <label>
+          Username
+          <input type="text" name="username" autocomplete="username" required />
+        </label>
+        <label>
+          Password
+          <input type="password" name="password" autocomplete="current-password" required />
+        </label>
+        <button class="btn primary" type="submit">Sign in</button>
+        <p class="form-feedback" id="login-feedback" role="status"></p>
+        <p class="login-hint">Default credentials: <code>owner</code> / <code>ownerpass123</code>. Update these before launching.</p>
+      </form>
+    </section>
+
+    <main class="dashboard-grid hidden" id="dashboard-main">
       <a class="btn" href="/">View live site</a>
     </header>
 

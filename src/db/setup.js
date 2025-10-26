@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const db = require('./connection');
 
 function runMigrations() {
@@ -36,6 +37,12 @@ function runMigrations() {
       phone TEXT,
       message TEXT,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS owners (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL
     );
   `;
 
@@ -122,6 +129,15 @@ function seedDefaults() {
     });
 
     insertMany(testimonials);
+  }
+
+  const ownerCount = db.prepare('SELECT COUNT(*) as count FROM owners').get();
+  if (!ownerCount.count) {
+    const passwordHash = bcrypt.hashSync('ownerpass123', 10);
+    db.prepare('INSERT INTO owners (username, password_hash) VALUES (@username, @password_hash)').run({
+      username: 'owner',
+      password_hash: passwordHash
+    });
   }
 }
 

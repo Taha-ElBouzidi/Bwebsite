@@ -14,6 +14,10 @@ body {
   box-sizing: border-box;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .dashboard-header {
   background: #0f172a;
   color: #f8fafc;
@@ -23,6 +27,12 @@ body {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .dashboard-header h1 {
@@ -54,6 +64,17 @@ body {
   color: #0f172a;
 }
 
+.btn.outline {
+  background: transparent;
+  border: 1px solid rgba(248, 250, 252, 0.6);
+  color: #f8fafc;
+}
+
+.btn.outline:hover {
+  box-shadow: none;
+  border-color: #f8fafc;
+}
+
 .btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 10px 24px rgba(37, 99, 235, 0.2);
@@ -76,6 +97,54 @@ body {
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+.login-panel {
+  max-width: 420px;
+  margin: 80px auto;
+  text-align: left;
+  gap: 16px;
+}
+
+.login-form {
+  display: grid;
+  gap: 16px;
+}
+
+.login-form label {
+  display: grid;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.login-form input {
+  border: 1px solid #cbd5f5;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  background: #f8fafc;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+  background: #ffffff;
+}
+
+.login-copy {
+  margin: 0;
+  color: #475569;
+}
+
+.login-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.login-panel .form-feedback {
+  color: #ef4444;
 }
 
 .panel-heading h2 {
