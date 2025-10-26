@@ -36,6 +36,8 @@ const requireAuth = (req, res, next) => {
   return res.status(401).json({ error: 'Unauthorized' });
 };
 
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
 const getBusinessProfile = () =>
   db.prepare(
     `SELECT id, name, tagline, description, phone, email, address, primary_color, secondary_color, accent_color
@@ -99,6 +101,7 @@ app.post('/api/auth/logout', (req, res) => {
 });
 
 app.put('/api/business', requireAuth, (req, res) => {
+app.put('/api/business', (req, res) => {
   const {
     name,
     tagline,
@@ -148,6 +151,7 @@ app.get('/api/services', (_req, res) => {
 });
 
 app.post('/api/services', requireAuth, (req, res) => {
+app.post('/api/services', (req, res) => {
   const { title, summary, display_order: displayOrder = 0 } = req.body;
   const stmt = db.prepare(
     'INSERT INTO services (title, summary, display_order) VALUES (@title, @summary, @display_order)'
@@ -160,6 +164,7 @@ app.post('/api/services', requireAuth, (req, res) => {
 });
 
 app.put('/api/services/:id', requireAuth, (req, res) => {
+app.put('/api/services/:id', (req, res) => {
   const { id } = req.params;
   const { title, summary, display_order: displayOrder } = req.body;
   const stmt = db.prepare(
@@ -173,6 +178,7 @@ app.put('/api/services/:id', requireAuth, (req, res) => {
 });
 
 app.delete('/api/services/:id', requireAuth, (req, res) => {
+app.delete('/api/services/:id', (req, res) => {
   const { id } = req.params;
   const stmt = db.prepare('DELETE FROM services WHERE id = ?');
   stmt.run(id);
@@ -185,6 +191,7 @@ app.get('/api/testimonials', (_req, res) => {
 });
 
 app.post('/api/testimonials', requireAuth, (req, res) => {
+app.post('/api/testimonials', (req, res) => {
   const { author, quote, role } = req.body;
   const stmt = db.prepare(
     'INSERT INTO testimonials (author, quote, role) VALUES (@author, @quote, @role)'
@@ -197,6 +204,7 @@ app.post('/api/testimonials', requireAuth, (req, res) => {
 });
 
 app.put('/api/testimonials/:id', requireAuth, (req, res) => {
+app.put('/api/testimonials/:id', (req, res) => {
   const { id } = req.params;
   const { author, quote, role } = req.body;
   const stmt = db.prepare(
@@ -210,12 +218,14 @@ app.put('/api/testimonials/:id', requireAuth, (req, res) => {
 });
 
 app.delete('/api/testimonials/:id', requireAuth, (req, res) => {
+app.delete('/api/testimonials/:id', (req, res) => {
   const { id } = req.params;
   db.prepare('DELETE FROM testimonials WHERE id = ?').run(id);
   res.status(204).end();
 });
 
 app.get('/api/leads', requireAuth, (_req, res) => {
+app.get('/api/leads', (_req, res) => {
   const leads = db
     .prepare(
       'SELECT id, name, email, phone, message, created_at FROM leads ORDER BY datetime(created_at) DESC'

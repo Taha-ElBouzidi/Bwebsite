@@ -60,6 +60,7 @@ const formatDate = (value) => {
 
 async function loadBusinessProfile() {
   const res = await apiFetch('/api/business');
+  const res = await fetch('/api/business');
   if (!res.ok) throw new Error('Failed to load business profile');
   const profile = await res.json();
   const fields = ['name', 'tagline', 'description', 'phone', 'email', 'address', 'primary_color', 'secondary_color', 'accent_color'];
@@ -78,6 +79,7 @@ async function loadBusinessProfile() {
 
 async function loadServices() {
   const res = await apiFetch('/api/services');
+  const res = await fetch('/api/services');
   if (!res.ok) throw new Error('Failed to load services');
   const services = await res.json();
   renderServices(services);
@@ -85,6 +87,7 @@ async function loadServices() {
 
 async function loadTestimonials() {
   const res = await apiFetch('/api/testimonials');
+  const res = await fetch('/api/testimonials');
   if (!res.ok) throw new Error('Failed to load testimonials');
   const testimonials = await res.json();
   renderTestimonials(testimonials);
@@ -92,6 +95,7 @@ async function loadTestimonials() {
 
 async function loadLeads() {
   const res = await apiFetch('/api/leads');
+  const res = await fetch('/api/leads');
   if (!res.ok) throw new Error('Failed to load leads');
   const leads = await res.json();
   renderLeads(leads);
@@ -133,6 +137,8 @@ function renderServices(services) {
           } catch (error) {
             console.error(error);
           }
+          await fetch(`/api/services/${id}`, { method: 'DELETE' });
+          await loadServices();
         }
         if (action === 'edit') {
           const title = prompt('Service title', service.title);
@@ -150,6 +156,12 @@ function renderServices(services) {
           } catch (error) {
             console.error(error);
           }
+          await fetch(`/api/services/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, summary, display_order: Number(order) || 0 })
+          });
+          await loadServices();
         }
       });
     });
@@ -194,6 +206,8 @@ function renderTestimonials(testimonials) {
           } catch (error) {
             console.error(error);
           }
+          await fetch(`/api/testimonials/${id}`, { method: 'DELETE' });
+          await loadTestimonials();
         }
         if (action === 'edit') {
           const author = prompt('Name', testimonial.author);
@@ -212,6 +226,12 @@ function renderTestimonials(testimonials) {
           } catch (error) {
             console.error(error);
           }
+          await fetch(`/api/testimonials/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ author, role, quote })
+          });
+          await loadTestimonials();
         }
       });
     });
@@ -254,6 +274,7 @@ businessForm?.addEventListener('submit', async (event) => {
   businessFeedback.textContent = 'Saving…';
   try {
     const res = await apiFetch('/api/business', {
+    const res = await fetch('/api/business', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -283,6 +304,14 @@ serviceForm?.addEventListener('submit', async (event) => {
     }
   } catch (error) {
     console.error(error);
+  const res = await fetch('/api/services', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (res.ok) {
+    serviceForm.reset();
+    await loadServices();
   }
 });
 
@@ -376,3 +405,17 @@ async function checkSession() {
 }
 
 checkSession();
+  const res = await fetch('/api/testimonials', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (res.ok) {
+    testimonialForm.reset();
+    await loadTestimonials();
+  }
+});
+
+Promise.all([loadBusinessProfile(), loadServices(), loadTestimonials(), loadLeads()]).catch((error) => {
+  console.error(error);
+});

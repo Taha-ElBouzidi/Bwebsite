@@ -1,4 +1,5 @@
 # Resto business website template
+# business website template
 
 A ready-to-customize business landing page backed by an Express API, SQLite database, and lightweight dashboard for editing content and reviewing leads. Use it as a starting point for almost any service business or product idea.
 
@@ -97,6 +98,21 @@ A ready-to-customize business landing page backed by an Express API, SQLite data
 | DELETE | `/api/testimonials/:id` | Delete a testimonial            | Yes           |
 | GET    | `/api/leads`        | List contact form submissions       | Yes           |
 | POST   | `/api/leads`        | Create a new lead from the contact form | No        |
+| Method | Path                | Description                         |
+| ------ | ------------------- | ----------------------------------- |
+| GET    | `/api/content`      | Aggregate landing page content      |
+| GET    | `/api/business`     | Fetch business profile details      |
+| PUT    | `/api/business`     | Update business profile             |
+| GET    | `/api/services`     | List services                       |
+| POST   | `/api/services`     | Create a new service                |
+| PUT    | `/api/services/:id` | Update an existing service          |
+| DELETE | `/api/services/:id` | Remove a service                    |
+| GET    | `/api/testimonials` | List testimonials                   |
+| POST   | `/api/testimonials` | Create a testimonial                |
+| PUT    | `/api/testimonials/:id` | Update a testimonial            |
+| DELETE | `/api/testimonials/:id` | Delete a testimonial            |
+| GET    | `/api/leads`        | List contact form submissions       |
+| POST   | `/api/leads`        | Create a new lead from the contact form |
 
 ## Environment variables
 
