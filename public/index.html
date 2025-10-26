@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Business Landing Page</title>
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="hero">
+      <nav class="nav">
+        <span class="logo" id="business-name">Your Business</span>
+        <a class="dashboard-link" href="/dashboard.html">Dashboard</a>
+      </nav>
+      <div class="hero-content">
+        <p class="eyebrow" id="hero-tagline">Tailored solutions for modern businesses</p>
+        <h1 id="hero-title">Build a homepage that adapts to any offer</h1>
+        <p class="hero-subtitle" id="hero-description">
+          Introduce your business with a confident value proposition, describe the results you create, and
+          guide visitors toward your most important call to action.
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#contact">Book a discovery call</a>
+          <a class="btn secondary" href="#services">Explore services</a>
+        </div>
+        <dl class="hero-details">
+          <div>
+            <dt>Call</dt>
+            <dd id="hero-phone">(555) 123-4567</dd>
+          </div>
+          <div>
+            <dt>Email</dt>
+            <dd id="hero-email">hello@yourbusiness.com</dd>
+          </div>
+          <div>
+            <dt>Visit</dt>
+            <dd id="hero-address">123 Main Street, Anytown, USA</dd>
+          </div>
+        </dl>
+      </div>
+    </header>
+
+    <main>
+      <section class="section" id="services">
+        <div class="section-heading">
+          <p class="eyebrow">What we do</p>
+          <h2>Services tailored to your goals</h2>
+          <p class="section-subtitle">
+            Swap in the services, packages, or products that you offer. Emphasize outcomes instead of features so
+            prospects immediately understand the value.
+          </p>
+        </div>
+        <div class="cards" id="services-list"></div>
+      </section>
+
+      <section class="section testimonials">
+        <div class="section-heading">
+          <p class="eyebrow">Proof in action</p>
+          <h2>Clients who trusted us</h2>
+          <p class="section-subtitle">
+            Share quotes from satisfied clients. Highlight measurable wins, transformation stories, or the quality
+            of your partnership.
+          </p>
+        </div>
+        <div class="testimonial-list" id="testimonial-list"></div>
+      </section>
+
+      <section class="section cta" id="contact">
+        <div class="cta-content">
+          <h2>Let’s design your success story</h2>
+          <p>
+            Use this contact form to capture leads. New submissions flow into the dashboard automatically so you
+            can respond quickly.
+          </p>
+        </div>
+        <form class="contact-form" id="contact-form">
+          <label>
+            Name
+            <input type="text" name="name" placeholder="Your name" />
+          </label>
+          <label>
+            Email*
+            <input type="email" name="email" required placeholder="you@example.com" />
+          </label>
+          <label>
+            Phone
+            <input type="tel" name="phone" placeholder="(555) 987-6543" />
+          </label>
+          <label>
+            How can we help?
+            <textarea name="message" rows="4" placeholder="Share a few details about your project"></textarea>
+          </label>
+          <button class="btn primary" type="submit">Submit</button>
+          <p class="form-feedback" id="form-feedback" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>&copy; <span id="footer-year"></span> <span id="footer-business-name">Your Business</span>. All rights reserved.</p>
+    </footer>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>

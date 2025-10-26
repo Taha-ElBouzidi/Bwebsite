@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Site Dashboard</title>
+    <link rel="stylesheet" href="styles/dashboard.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="dashboard-header">
+      <div>
+        <h1>Website Control Center</h1>
+        <p>Update your landing page copy, manage services, share testimonials, and review incoming leads.</p>
+      </div>
+      <a class="btn" href="/">View live site</a>
+    </header>
+
+    <main class="dashboard-grid">
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Brand & messaging</h2>
+          <p>Update primary details shown across the landing page.</p>
+        </div>
+        <form id="business-form" class="form-grid">
+          <label>
+            Business name
+            <input type="text" name="name" required />
+          </label>
+          <label>
+            Tagline
+            <input type="text" name="tagline" />
+          </label>
+          <label class="full-width">
+            Description
+            <textarea name="description" rows="4"></textarea>
+          </label>
+          <label>
+            Phone
+            <input type="text" name="phone" />
+          </label>
+          <label>
+            Email
+            <input type="email" name="email" />
+          </label>
+          <label class="full-width">
+            Address
+            <input type="text" name="address" />
+          </label>
+          <label>
+            Primary color
+            <input type="color" name="primary_color" />
+          </label>
+          <label>
+            Secondary color
+            <input type="color" name="secondary_color" />
+          </label>
+          <label>
+            Accent color
+            <input type="color" name="accent_color" />
+          </label>
+          <button class="btn primary" type="submit">Save changes</button>
+          <p class="form-feedback" id="business-feedback" role="status"></p>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Services</h2>
+          <p>List the offerings you want to promote.</p>
+        </div>
+        <form id="service-form" class="form-grid">
+          <label>
+            Title
+            <input type="text" name="title" required />
+          </label>
+          <label>
+            Display order
+            <input type="number" name="display_order" min="0" value="0" />
+          </label>
+          <label class="full-width">
+            Summary
+            <textarea name="summary" rows="3" required></textarea>
+          </label>
+          <button class="btn primary" type="submit">Add service</button>
+        </form>
+        <div class="list" id="services-table"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Testimonials</h2>
+          <p>Build trust with social proof.</p>
+        </div>
+        <form id="testimonial-form" class="form-grid">
+          <label>
+            Name
+            <input type="text" name="author" required />
+          </label>
+          <label>
+            Role / Company
+            <input type="text" name="role" />
+          </label>
+          <label class="full-width">
+            Quote
+            <textarea name="quote" rows="3" required></textarea>
+          </label>
+          <button class="btn primary" type="submit">Add testimonial</button>
+        </form>
+        <div class="list" id="testimonials-table"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Incoming leads</h2>
+          <p>Monitor submissions from the landing page contact form.</p>
+        </div>
+        <div class="list" id="leads-table"></div>
+      </section>
+    </main>
+
+    <script src="dashboard.js" type="module"></script>
+  </body>
+</html>
