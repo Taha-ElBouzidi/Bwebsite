@@ -1,4 +1,4 @@
-# Resto business website template
+# business website template
 
 A ready-to-customize business landing page backed by an Express API, SQLite database, and lightweight dashboard for editing content and reviewing leads. Use it as a starting point for almost any service business or product idea.
 
